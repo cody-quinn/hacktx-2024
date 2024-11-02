@@ -1,4 +1,4 @@
-from emulator import Emulator
+from src.emulator import Emulator
 from fastapi import WebSocket
 from collections import Counter
 
