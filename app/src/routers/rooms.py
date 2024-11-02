@@ -66,7 +66,7 @@ class Room:
   inputs: dict[int,str]
 
   def __init__(self, rom: RomPrivate):
-    self.running = False
+    self.running = True
     self.id = get_room_id()
     self.emulator = Emulator(rom.filename)
     self.players = []
@@ -129,7 +129,7 @@ async def create_room(body: RoomCreate):
 
 # TODO: not this bullshit
 @router.put("/rooms/{room_id}/{player_id}/{input}")
-async def send_input(room_id, player_id, input):
+async def send_input(room_id: int, player_id: int, input: str):
   room = rooms[[room.id for room in rooms].index(room_id)]
   room.inputs[player_id] = input
 
@@ -143,7 +143,7 @@ async def websocket(sock: WebSocket, room_id: int):
   await sock.accept()
   player = Player(sock)
 
-  player.nick = str(await sock.receive())
+  player.nick = str(await sock.receive_text())
   room.player_join(player)
-
   print(f"Player named {player.nick} joined room {room_id}.")
+  await player.send(f"Player named {player.nick} joined room {room_id}.")
