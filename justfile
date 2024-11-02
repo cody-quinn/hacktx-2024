@@ -10,6 +10,7 @@ dev: setup
         "just frontend-dev" \
         "just backend-dev"
 
+# Generate typescript react client
 generate-client:
     pnpm -C frontend run generate-client
 
@@ -17,11 +18,14 @@ generate-client:
 datagen:
     uv --project app run app/datagen.py
 
+# Run pnpm
 setup:
     pnpm install
 
+# Run the frontend
 frontend-dev:
     pnpm -C frontend run dev
 
+# Run the backend
 backend-dev:
     DEBUG=true uv --project app run fastapi dev

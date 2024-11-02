@@ -17,6 +17,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+app/cores/*.so
+app/games/*.gb
+
 .venv
 
 # Database
