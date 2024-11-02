@@ -1,0 +1,5 @@
+# Prettier should only run on JavaScript & TypeScript files
+/*
+!*.{js,jsx,ts,tsx}
+!*/
+*.gen.*
