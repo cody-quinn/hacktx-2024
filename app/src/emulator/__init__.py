@@ -1,5 +1,4 @@
 import pyboy as pb
-from pyboy.utils import WindowEvent
 
 class Emulator:
   game: pb.PyBoy
@@ -19,7 +18,7 @@ class Emulator:
   def stop(self):
     self.game.stop()
 
-  def send_cmd(self, cmd: str):
+  def send_button(self, cmd: str):
     if self.fcount % 2 == 0:
       self.game.button(cmd)
 
