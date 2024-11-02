@@ -44,8 +44,18 @@
             python312
             pyright
             uv
+
+            libz
           ]
           ++ self.checks.${system}.pre-commit-check.enabledPackages;
+
+        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (
+          with pkgs;
+          [
+            stdenv.cc.cc.lib
+            libz
+          ]
+        );
       };
     };
 }
