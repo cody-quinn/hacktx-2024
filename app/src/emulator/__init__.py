@@ -10,6 +10,7 @@ class Emulator:
 
   def start_game(self):
     self.game.game_wrapper.start_game()
+    self.game.set_emulation_speed(1)
 
   def tick(self):
     self.game.tick()
