@@ -8,10 +8,13 @@ from starlette.responses import Response
 from starlette.types import Scope
 
 from src.database import initialize_db
+from src.routers import rooms
 
 debug = os.getenv("DEBUG", "false").lower() == "true"
 
 api = FastAPI(debug=debug)
+
+api.include_router(rooms.router)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
