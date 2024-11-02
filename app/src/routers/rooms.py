@@ -46,7 +46,7 @@ class Player:
   sock: WebSocket
 
   def __init__(self, sock: WebSocket, nick: str | None = None):
-    if nick == None:
+    if nick is None:
       nick = "Player"
 
     self.id = get_player_id()
@@ -54,7 +54,7 @@ class Player:
     self.sock = sock
 
   async def send(self, message):
-    if self.sock != None:
+    if self.sock is not None:
       await self.sock.send_bytes(message)
 
 class Room:
