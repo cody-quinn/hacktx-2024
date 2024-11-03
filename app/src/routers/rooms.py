@@ -1,7 +1,7 @@
 import threading
 import asyncio
 from pathlib import Path
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect 
 from pydantic import BaseModel
 from src.emulator import Emulator
 from collections import Counter
@@ -143,7 +143,14 @@ async def websocket(sock: WebSocket, room_id: int):
   await sock.accept()
   player = Player(sock)
 
+  
   player.nick = str(await sock.receive_text())
   room.player_join(player)
   print(f"Player named {player.nick} joined room {room_id}.")
   await player.send(f"Player named {player.nick} joined room {room_id}.")
+
+  try:
+      while True:
+          room.inputs[player.id] = str(await sock.receive_text())
+  except WebSocketDisconnect:
+      room.player_leave(player)
