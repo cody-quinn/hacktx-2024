@@ -4,14 +4,28 @@ export type HTTPValidationError = {
   detail?: Array<ValidationError>;
 };
 
+export type PlayerPublic = {
+  id?: number;
+  nick: string;
+};
+
 export type Rom = {
   id: string;
   art: string;
   title: string;
+  author: string;
+  link: string;
 };
 
 export type RoomCreate = {
   rom_id: string;
+};
+
+export type RoomPublic = {
+  id: number;
+  players: Array<PlayerPublic>;
+  rom: Rom;
+  started_at: string;
 };
 
 export type ValidationError = {
@@ -24,7 +38,7 @@ export type GetRomsRomsGetResponse = Array<Rom>;
 
 export type GetRomsRomsGetError = unknown;
 
-export type GetRoomsRoomsGetResponse = Array<number>;
+export type GetRoomsRoomsGetResponse = Array<RoomPublic>;
 
 export type GetRoomsRoomsGetError = unknown;
 
