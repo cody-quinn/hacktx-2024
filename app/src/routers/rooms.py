@@ -300,6 +300,9 @@ async def websocket(sock: WebSocket, room_id: int):
     while True:
       input: str = await sock.receive_text()
       input = input.rstrip("\n")
+      if input == "nothing:hold":
+        await player.send(b"you are a neanderthal and should be treated as such")
+        return
       print(input.split(":"), flush=True)
       # await room.broadcast(str.encode(f"{player.nick} said {str(input.split(":"))}"))
       if input.split(":")[0] in valid_inputs:
