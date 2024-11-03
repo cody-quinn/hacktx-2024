@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
@@ -9,7 +8,7 @@ from src.emulator import Emulator
 router = APIRouter()
 
 valid_inputs = [
-  "nothing"
+  "nothing",
   "left",
   "right",
   "up",
