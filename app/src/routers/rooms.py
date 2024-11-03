@@ -110,33 +110,26 @@ class Room:
   async def helper(self, lock: asyncio.Lock, data: dict[int, str]):
     counts: dict[str, int] = {}
     async with lock:
-      print(lock, flush=True)
       for input in data.values():
-        print(input, flush=True)
         if input not in counts.keys():
           counts[input] = 0
         counts[input] += 1
-        print(counts, flush=True)
       self.reset_input()
 
-    print(counts, flush=True)
     value = max(counts, key=lambda x: counts[x])
-    print(value, flush=True)
     return value
 
 
   async def send_command(self):
-    print(self.inputs, flush=True)
     # value, count = Counter(self.inputs.values()).most_common(1)[0]
     if len(self.inputs) == 0:
       return
-    print("RUNNING THE SHIT", flush=True)
     lock = asyncio.Lock()
     value: str = await self.helper(lock, self.inputs)
 
 
     self.emulator.send_button(value)
-    print(f"player said {value}", flush=True)
+    print(f"players said {value}", flush=True)
 
   async def broadcast(self, message):
     for player in self.players:
