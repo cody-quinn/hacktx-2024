@@ -1,7 +1,4 @@
-import concurrent.futures
-import threading
 import asyncio
-from pathlib import Path
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from src.emulator import Emulator
@@ -22,7 +19,13 @@ roms = {
     id="tetris",
     art="/assets/tetris.png",
     title="Tetris(R)",
-    filename="app/games/tetris.gb",
+    filename="./app/games/tetris.gb",
+  ),
+  "dino": RomPrivate(
+    id="dino",
+    art="/assets/dino.png",
+    title="Dino Game",
+    filename="./app/games/dino.gb"
   )
 }
 
