@@ -1,14 +1,27 @@
 import pyboy as pb
 
+valid_inputs = [
+  "nothing"
+  "left",
+  "right",
+  "up",
+  "down",
+  "a",
+  "b",
+  "start",
+  "select",
+]
+
 class Emulator:
   game: pb.PyBoy
   rom: str
-
+  held: str | None
   prev: int
   curr: int
   framebuffer: bytes
 
   def __init__(self, rom: str):
+    self.held = None
     self.rom = rom
     self.game = pb.PyBoy(rom)
     self.curr = 0
@@ -24,8 +37,18 @@ class Emulator:
     self.game.tick()
     # self.framecount += 1
 
-  def send_button(self, cmd: str):
-    # print(cmd)
+  def send_button(self, cmd: str, hold=False):
+    if cmd.split(":")[0] == "nothing":
+      return
+    if hold:
+      if self.held is not None and self.held != cmd:
+        self.game.button_release(self.held)
+      self.game.button_press(cmd)
+      self.held = cmd
+      return
+    if self.held is not None:
+      self.game.button_release(self.held)
+    self.held = None
     self.game.button(cmd)
 
   def update_framebuffer(self):
