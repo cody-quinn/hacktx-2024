@@ -1,10 +1,22 @@
 import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from numpy import empty
 from pydantic import BaseModel
 from src.emulator import Emulator
 from collections import Counter
 
 router = APIRouter()
+
+valid_inputs = [
+  "left",
+  "right",
+  "up",
+  "down",
+  "a",
+  "b",
+  "start",
+  "select",
+]
 
 class Rom(BaseModel):
   id: str
@@ -62,6 +74,7 @@ class Player:
 
 class Room:
   # thread: threading.Thread
+  task2: asyncio.Task | None
   task: asyncio.Task | None
   emulator: Emulator
 
@@ -71,6 +84,7 @@ class Room:
 
   def __init__(self, rom: RomPrivate):
     self.task = None
+    self.task2 = None
     self.emulator = Emulator(rom.filename)
 
     self.id = next(room_id)
@@ -93,11 +107,36 @@ class Room:
   #   while self.running:
   #     await self.tick()
 
-  def send_command(self):
-    value, count =  Counter(self.inputs.values()).most_common(1)[0]
-    if count == 0:
+  async def helper(self, lock: asyncio.Lock, data: dict[int, str]):
+    counts: dict[str, int] = {}
+    async with lock:
+      print(lock, flush=True)
+      for input in data.values():
+        print(input, flush=True)
+        if input not in counts.keys():
+          counts[input] = 0
+        counts[input] += 1
+        print(counts, flush=True)
+      self.reset_input()
+
+    print(counts, flush=True)
+    value = max(counts, key=lambda x: counts[x])
+    print(value, flush=True)
+    return value
+
+
+  async def send_command(self):
+    print(self.inputs, flush=True)
+    # value, count = Counter(self.inputs.values()).most_common(1)[0]
+    if len(self.inputs) == 0:
       return
+    print("RUNNING THE SHIT", flush=True)
+    lock = asyncio.Lock()
+    value: str = await self.helper(lock, self.inputs)
+
+
     self.emulator.send_button(value)
+    print(f"player said {value}", flush=True)
 
   async def broadcast(self, message):
     for player in self.players:
@@ -107,19 +146,20 @@ class Room:
     self.inputs = {}
 
   def start(self):
-    if self.task is not None:
+    if self.task is not None and self.task2 is not None:
       return
 
     loop = asyncio.get_event_loop()
 
     self.emulator.start()
+    self.task2 = loop.create_task(self._readinput())
     self.task = loop.create_task(self._loop())
 
-  def stop(self):
-    if self.task is None:
-      return
 
-    self.task.cancel()
+  def stop(self):
+    if self.task is not None and self.task2 is not None:
+      self.task.cancel()
+      self.task2.cancel()
     self.emulator.stop()
 
   async def _loop(self):
@@ -133,6 +173,18 @@ class Room:
           await player.send(self.emulator.framebuffer)
 
         await asyncio.sleep(1/10)
+    finally:
+      pass
+
+  async def _readinput(self):
+    try:
+      while True:
+        for player in self.players:
+          await player.send(b"Recieved input")
+        await self.send_command()
+        await asyncio.sleep(1)
+    except Exception as e:
+      print(e)
     finally:
       pass
 
@@ -169,7 +221,11 @@ async def websocket(sock: WebSocket, room_id: int):
   await player.send(str.encode(f"Player named {player.nick} joined room {room_id}."))
 
   try:
-      while True:
-          room.inputs[player.id] = str(await sock.receive_text())
+    while True:
+      input: str = await sock.receive_text()
+      input = input.rstrip("\n")
+      await sock.send_text(f"Data recieved: {input}")
+      if input in valid_inputs:
+        room.inputs[player.id] = input
   except WebSocketDisconnect:
-      room.player_leave(player)
+    room.player_leave(player)

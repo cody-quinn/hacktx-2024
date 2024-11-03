@@ -23,6 +23,7 @@ class Emulator:
     self.framecount += 1
 
   def send_button(self, cmd: str):
+    print(cmd)
     if self.framecount % 2 == 0:
       self.game.button(cmd)
 
