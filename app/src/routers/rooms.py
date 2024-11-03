@@ -1,4 +1,7 @@
 import asyncio
+import datetime
+from typing import Any
+
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from numpy import empty
 from pydantic import BaseModel
@@ -112,9 +115,12 @@ class Room:
   purgable: bool
   id: int
   players: list[Player]
+  rom: RomPrivate
   inputs: dict[int,str]
+  started_at: datetime.datetime
 
   def __init__(self, rom: RomPrivate):
+    self.rom = rom
     self.purgable = False
     self.task = None
     self.task2 = None
@@ -123,6 +129,8 @@ class Room:
     self.id = next(room_id)
     self.players = []
     self.inputs = {}
+
+    self.started_at = datetime.datetime.now(datetime.UTC)
 
   def player_join(self, player: Player):
     if player in self.players:
@@ -217,12 +225,38 @@ class Room:
 
 rooms: dict[int, Room] = {}
 
+class PlayerPublic(BaseModel):
+  id: int = next(player_id)
+  nick: str
+
+  @staticmethod
+  def create(player: Player):
+    return PlayerPublic(
+      id = player.id,
+      nick = player.nick,
+    )
+
+class RoomPublic(BaseModel):
+  id: int
+  players: list[PlayerPublic]
+  rom: Rom
+  started_at: datetime.datetime
+
+  @staticmethod
+  def create(room: Room):
+    return RoomPublic(
+      id = room.id,
+      players = [PlayerPublic.create(player) for player in room.players],
+      rom = room.rom,
+      started_at = room.started_at,
+    )
+
 class RoomCreate(BaseModel):
   rom_id: str
 
-@router.get("/rooms", response_model=list[int])
-async def get_rooms() -> list[int]:
-  return [room.id for room in rooms.values()]
+@router.get("/rooms", response_model=list[RoomPublic])
+async def get_rooms() -> list[RoomPublic]:
+  return [RoomPublic.create(room) for room in rooms.values()]
 
 @router.post("/rooms")
 async def create_room(body: RoomCreate) -> int:

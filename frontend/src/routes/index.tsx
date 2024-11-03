@@ -6,8 +6,12 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  return <div>
-    <h1>Homepage</h1>
-    <h3><Link to={"/createroom"}>Create room</Link></h3>
-  </div>
+  return (
+    <div>
+      <h1>Homepage</h1>
+      <h3>
+        <Link to={"/createroom"}>Create room</Link>
+      </h3>
+    </div>
+  );
 }
