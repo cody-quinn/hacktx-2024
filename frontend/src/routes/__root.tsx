@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { RouterContext } from "../main";
-import { ClassNames, css } from "@emotion/react";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,

@@ -9,51 +9,48 @@ export const Route = createFileRoute("/")({
   },
 });
 
-function HomeComponent() {
-  return (
-    <div
-      css={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <h1
-        css={{
-          fontFamily: "monospace",
-        }}
-      >
-        Welcome to PartyGB
-      </h1>
-      <Link
-        to={"/createroom"}
-        css={{
-          fontSize: "24px",
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-          color: "#1e1e1e",
-          textDecoration: "none",
-          borderRadius: "5px",
-          borderColor: "#1e1e1e",
-          borderWidth: "3",
-          padding: "1rem",
-          backgroundColor: "#eeeeee",
-          borderStyle: "solid",
-        }}
-      >
-        Create room
-      </Link>
-    </div>
-  );
-}
-
 function RoomComponent() {
   const query = useQuery(getRoomsRoomsGetOptions());
   const values = query.data;
 
   return (
     <>
-      <HomeComponent />
+      <div
+        css={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 24,
+        }}
+      >
+        <h1
+          css={{
+            fontFamily: "monospace",
+            margin: 0,
+          }}
+        >
+          Welcome to PartyGB
+        </h1>
+        <Link
+          to={"/createroom"}
+          css={{
+            fontSize: "24px",
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+            color: "#1e1e1e",
+            textDecoration: "none",
+            borderRadius: "5px",
+            borderColor: "#1e1e1e",
+            borderWidth: "3",
+            padding: "1rem",
+            backgroundColor: "#eeeeee",
+            borderStyle: "solid",
+          }}
+        >
+          Create room
+        </Link>
+        <button onClick={() => query.refetch()}>Refresh</button>
+      </div>
       <div
         css={{
           display: "flex",
