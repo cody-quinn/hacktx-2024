@@ -44,7 +44,7 @@
             python312
             pyright
             uv
-
+            typescript
             libz
           ]
           ++ self.checks.${system}.pre-commit-check.enabledPackages;
