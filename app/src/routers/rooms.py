@@ -193,6 +193,7 @@ class Room:
     print(f"players said {value}", flush=True)
 
   async def broadcast(self, message):
+    print(f"BROADCAST: {message}", flush=True)
     for player in self.players:
       await player.send(message)
 
@@ -308,7 +309,7 @@ async def websocket(sock: WebSocket, room_id: int):
       input: str = await sock.receive_text()
       input = input.rstrip("\n")
       if input[0] == "C":
-        await room.broadcast(f"C:{player.nick}:{input}")
+        await room.broadcast(f"C:{player.nick}:{input[1::]}")
         continue
       if input == "nothing:hold":
         await player.send(b"you are a neanderthal and should be treated as such")
