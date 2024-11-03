@@ -121,26 +121,15 @@ class Room:
 
   async def _loop(self):
     try:
-      loop = asyncio.get_running_loop()
-
       while True:
-        print("Tick ", end="", flush=True)
-
-        # with concurrent.futures.ProcessPoolExecutor() as pool:
-          # await loop.run_in_executor(pool, self.emulator.tick, ())
-
         self.emulator.tick()
         self.emulator.update_framebuffer()
-
-        print(self.emulator.framebuffer, flush=True)
 
         for player in self.players:
           await player.send(b'F')
           await player.send(self.emulator.framebuffer)
 
         await asyncio.sleep(1/10)
-
-        print("Tock", flush=True)
     finally:
       pass
 
