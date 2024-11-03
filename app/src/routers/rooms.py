@@ -59,6 +59,7 @@ class Player:
 
   id: int
   nick: str
+  fresh: bool
 
   def __init__(self, sock: WebSocket, nick: str | None = None):
     if nick is None:
@@ -66,6 +67,7 @@ class Player:
 
     self.id = next(player_id)
     self.nick = nick
+    self.fresh = True
     self.sock = sock
 
   async def send(self, message: bytes):
@@ -127,7 +129,6 @@ class Room:
     lock = asyncio.Lock()
     value: str = await self.helper(lock, self.inputs)
 
-
     self.emulator.send_button(value)
     print(f"players said {value}", flush=True)
 
@@ -142,11 +143,9 @@ class Room:
     if self.task is not None and self.task2 is not None:
       return
 
-    loop = asyncio.get_event_loop()
-
     self.emulator.start()
-    self.task2 = loop.create_task(self._readinput())
-    self.task = loop.create_task(self._loop())
+    self.task2 = asyncio.create_task(self._readinput())
+    self.task = asyncio.create_task(self._loop())
 
 
   def stop(self):
@@ -162,17 +161,17 @@ class Room:
         self.emulator.update_framebuffer()
 
         for player in self.players:
-          await player.send(b'F' + self.emulator.framebuffer)
+          if player.fresh or (self.emulator.prev != self.emulator.curr):
+            player.fresh = False
+            await player.send(b'F' + self.emulator.framebuffer)
 
-        await asyncio.sleep(1/10)
+        await asyncio.sleep(1/60)
     finally:
       pass
 
   async def _readinput(self):
     try:
       while True:
-        for player in self.players:
-          await player.send(b"Recieved input")
         await self.send_command()
         await asyncio.sleep(1)
     except Exception as e:
@@ -198,6 +197,7 @@ async def create_room(body: RoomCreate):
 
 @router.websocket("/ws/{room_id}")
 async def websocket(sock: WebSocket, room_id: int):
+  global rooms
   room = rooms[room_id]
   if room is None:
     await sock.close()
@@ -216,7 +216,6 @@ async def websocket(sock: WebSocket, room_id: int):
     while True:
       input: str = await sock.receive_text()
       input = input.rstrip("\n")
-      await sock.send_text(f"Data recieved: {input}")
       if input in valid_inputs:
         room.inputs[player.id] = input
   except WebSocketDisconnect:

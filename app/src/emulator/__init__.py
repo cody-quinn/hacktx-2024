@@ -4,12 +4,14 @@ class Emulator:
   game: pb.PyBoy
   rom: str
 
-  # framecount: int = 0
+  prev: int
+  curr: int
   framebuffer: bytes
 
   def __init__(self, rom: str):
     self.rom = rom
     self.game = pb.PyBoy(rom)
+    self.curr = 0
 
   def start(self):
     self.game.game_wrapper.start_game(timer_div=0x00)
@@ -36,3 +38,5 @@ class Emulator:
       n3 = raw[j+12] // 85
       buf[i] = n0 | n1 | n2 | n3
     self.framebuffer = bytes(buf)
+    self.prev = self.curr
+    self.curr = hash(self.framebuffer)
