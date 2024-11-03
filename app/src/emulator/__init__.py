@@ -4,7 +4,7 @@ class Emulator:
   game: pb.PyBoy
   rom: str
 
-  framecount: int = 0
+  # framecount: int = 0
   framebuffer: bytes
 
   def __init__(self, rom: str):
@@ -20,12 +20,11 @@ class Emulator:
 
   def tick(self):
     self.game.tick()
-    self.framecount += 1
+    # self.framecount += 1
 
   def send_button(self, cmd: str):
-    print(cmd)
-    if self.framecount % 2 == 0:
-      self.game.button(cmd)
+    # print(cmd)
+    self.game.button(cmd)
 
   def update_framebuffer(self):
     raw = self.game.screen.ndarray.flatten()
