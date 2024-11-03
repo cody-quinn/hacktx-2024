@@ -22,23 +22,53 @@ class Rom(BaseModel):
   id: str
   art: str
   title: str
+  author: str
+  link: str
 
 class RomPrivate(Rom):
   filename: str
 
 roms = {
-  "tetris": RomPrivate(
-    id="tetris",
-    art="/assets/tetris.png",
-    title="Tetris(R)",
-    filename="./app/games/tetris.gb",
+  "mud": RomPrivate(
+    id="mud",
+    art="/assets/mud.png",
+    title="Mud Warrior",
+    filename="./app/games/mud.gb",
+    author="Ryan's Veeder",
+    link="https://polyducks.itch.io/mud-warriors-gameboy",
   ),
-  "dino": RomPrivate(
-    id="dino",
-    art="/assets/dino.png",
-    title="Dino Game",
-    filename="./app/games/dino.gb"
-  )
+  "muffinalpaca": RomPrivate(
+    id="muffinalpaca",
+    art="/assets/muffinalpaca.png",
+    title="Muffin the Alpaca",
+    filename="./app/games/muffinalpaca.gb",
+    author="Fronze",
+    link="https://fronze.itch.io/muffin-the-alpaca"
+  ),
+  "espeto": RomPrivate(
+    id="espeto",
+    art="/assets/espeto.png",
+    title="Espeto Blast!",
+    filename="./app/games/espeto.gb",
+    author="sergeeo",
+    link="https://sergeeo.itch.io/espeto-blast"
+  ),
+  "hungrymonster": RomPrivate(
+    id="hungrymonster",
+    art="/assets/hungrymonster.png",
+    title="Hungry Monster",
+    filename="./app/games/hungrymonster.gb",
+    author="rVaquero",
+    link="https://rvaquero.itch.io/hungry-monster"
+  ),
+  "sovietsnake": RomPrivate(
+    id="sovietsnake",
+    art="/assets/sovietsnake.png",
+    title="Soviet Snake",
+    filename="./app/games/sovietsnake.gb",
+    author="danim",
+    link="https://danim.itch.io/sovie-snake-html-5"
+  ),
 }
 
 @router.get("/roms", response_model=list[Rom])
