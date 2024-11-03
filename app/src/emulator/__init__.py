@@ -54,11 +54,13 @@ class Emulator:
   def update_framebuffer(self):
     raw = self.game.screen.ndarray.flatten()
     buf = [0] * (len(raw) // 16 + 1)
+    def rgb2gray(arr, ind):
+        return arr[ind] * .3 + arr[ind+1] * .6 + arr[ind+2] * .1  
     for i, j in enumerate(range(0, len(raw), 16)):
-      n0 = raw[j]    // 85 << 6
-      n1 = raw[j+4]  // 85 << 4
-      n2 = raw[j+8]  // 85 << 2
-      n3 = raw[j+12] // 85
+      n0 = rgb2gray(j)    // 85 << 6
+      n1 = rgb2gray(j+4)  // 85 << 4
+      n2 = rgb2gray(j+8)  // 85 << 2
+      n3 = rgb2gray(j+12) // 85
       buf[i] = n0 | n1 | n2 | n3
     self.framebuffer = bytes(buf)
     self.prev = self.curr
