@@ -106,13 +106,15 @@ function RoomComponent() {
         }}
       />
 
-      <div css={{
-        display: "flex",
-        "& button": {
-          width: 80,
-          height: 80,
-        }
-      }}>
+      <div
+        css={{
+          display: "flex",
+          "& button": {
+            width: 80,
+            height: 80,
+          },
+        }}
+      >
         {[
           "nothing",
           "left",
@@ -128,6 +130,24 @@ function RoomComponent() {
             {action}
           </GameButton>
         ))}
+      </div>
+
+      <div
+        css={{
+          display: "flex",
+          "& button": {
+            width: 80,
+            height: 80,
+          },
+        }}
+      >
+        {["nothing", "left", "right", "up", "down", "a", "b", "start", "select"]
+          .map((it) => `${it}:hold`)
+          .map((action) => (
+            <GameButton socket={wsConnectionRef} message={action}>
+              {action}
+            </GameButton>
+          ))}
       </div>
     </div>
   );
