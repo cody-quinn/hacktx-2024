@@ -169,8 +169,7 @@ class Room:
         self.emulator.update_framebuffer()
 
         for player in self.players:
-          await player.send(b'F')
-          await player.send(self.emulator.framebuffer)
+          await player.send(b'F' + self.emulator.framebuffer)
 
         await asyncio.sleep(1/10)
     finally:

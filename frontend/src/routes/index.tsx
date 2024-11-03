@@ -5,9 +5,27 @@ export const Route = createFileRoute("/")({
   component: HomeComponent,
 });
 
+const palette = [0xffffff, 0xaaaaaa, 0x666666, 0x000000];
+
+// Handles 160x144 4 color
+function expandData(compacted: Uint8Array): Uint8Array {
+  const buffer = new Uint8Array(160 * 144);
+  for (let i = 0; i < 160 * 144; i += 4) {
+    const byte = compacted[i / 4];
+    buffer[i] = (byte & 0b11000000) >> 6;
+    buffer[i + 1] = (byte & 0b00110000) >> 4;
+    buffer[i + 2] = (byte & 0b00001100) >> 2;
+    buffer[i + 3] = byte & 0b00000011;
+  }
+
+  return buffer;
+}
+
 function HomeComponent() {
-  const connection = React.useRef<WebSocket | null>(null);
-  const [compressed, setCompressed] = React.useState<Uint8Array>(new Uint8Array(5760));
+  const wsConnectionRef = React.useRef<WebSocket | null>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  const [frame, setFrame] = React.useState<Uint8Array>(new Uint8Array(5760));
 
   React.useEffect(() => {
     const socket = new WebSocket("ws://localhost:8000/api/ws/1");
@@ -21,44 +39,36 @@ function HomeComponent() {
     socket.addEventListener("message", async (event: MessageEvent<Blob>) => {
       const data = await event.data?.arrayBuffer();
       const view = new Uint8Array(data);
-      if (view.at(0) !== 70) {
-        setCompressed(view);
+
+      if (view.at(0) === "F".charCodeAt(0)) {
+        setFrame(expandData(view.slice(1)));
       }
     });
 
-    connection.current = socket;
+    wsConnectionRef.current = socket;
 
-    return () => connection.current?.close();
+    return () => wsConnectionRef.current?.close();
   }, []);
 
-  const text = React.useMemo(() => {
-    let bytes = new Array(5760 * 4);
-    for (let i = 0; i < 5760 * 4; i += 4) {
-      const byte = compressed[i / 4];
-      bytes[i]     = (byte & 0b11000000) >> 6;
-      bytes[i + 1] = (byte & 0b00110000) >> 4;
-      bytes[i + 2] = (byte & 0b00001100) >> 2;
-      bytes[i + 3] = (byte & 0b00000011);
+  React.useLayoutEffect(() => {
+    const buffer = new Uint8ClampedArray(160 * 144 * 4);
+    for (let i = 0; i < 160 * 144 * 4; i += 4) {
+      const color = palette[frame[i / 4]];
+      buffer[i] = color >> 16 & 0xff;
+      buffer[i + 1] = color >> 8 & 0xff;
+      buffer[i + 2] = color & 0xff;
+      buffer[i + 3] = 255;
     }
 
-    bytes = bytes.map((v, i) => i % 160 === 0 ? 4 : v);
+    if (!canvasRef.current) {
+      return;
+    }
 
-    return bytes.map((byte) => {
-      switch (byte) {
-        case 0:
-        case 1:
-          return "⬜"
-        case 2:
-        case 3:
-          return "◼️"
-        case 4:
-          return "\n"
-      }
-    }).join("");
-  }, [compressed]);
-
-  // let x = Array.from({ length: 144 }, () => "⬛").join("");
-  // let y = Array.from({ length: 160 }, () => x).join("\n");
+    const context = canvasRef.current.getContext("2d")!;
+    const idata = context.createImageData(160, 144);
+    idata.data.set(buffer);
+    context.putImageData(idata, 0, 0);
+  }, [frame]);
 
   return (
     <div
@@ -68,11 +78,7 @@ function HomeComponent() {
         fontSize: 5,
       }}
     >
-      <pre
-        dangerouslySetInnerHTML={{
-          __html: text,
-        }}
-      ></pre>
+      <canvas ref={canvasRef} />
     </div>
   );
 }
