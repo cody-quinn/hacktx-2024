@@ -79,12 +79,13 @@ class Room:
   task2: asyncio.Task | None
   task: asyncio.Task | None
   emulator: Emulator
-
+  purgable: bool
   id: int
   players: list[Player]
   inputs: dict[int,str]
 
   def __init__(self, rom: RomPrivate):
+    self.purgable = False
     self.task = None
     self.task2 = None
     self.emulator = Emulator(rom.filename)
@@ -97,6 +98,7 @@ class Room:
     if player in self.players:
       return
     self.players.append(player)
+    self.purgable = True
 
   def player_leave(self, player: Player):
     self.players.remove(player)
@@ -153,12 +155,16 @@ class Room:
       self.task.cancel()
       self.task2.cancel()
     self.emulator.stop()
+    del rooms[self.id]
 
   async def _loop(self):
     try:
       while True:
         self.emulator.tick()
         self.emulator.update_framebuffer()
+
+        if len(self.players) == 0 and self.purgable:
+          self.stop()
 
         for player in self.players:
           if player.fresh or (self.emulator.prev != self.emulator.curr):
@@ -189,7 +195,7 @@ async def get_rooms() -> list[int]:
   return [room.id for room in rooms.values()]
 
 @router.post("/rooms")
-async def create_room(body: RoomCreate):
+async def create_room(body: RoomCreate) -> int:
   room = Room(roms[body.rom_id])
   rooms[room.id] = room
   room.start()

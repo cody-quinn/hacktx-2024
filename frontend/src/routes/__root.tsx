@@ -37,12 +37,12 @@ function RootComponent() {
                 Home
               </Link>{" "}
               <Link
-                to="/items"
+                to="/rooms"
                 activeProps={{
                   className: css({ fontWeight: "bold " }),
                 }}
               >
-                Items
+                Rooms
               </Link>
             </>
           )}

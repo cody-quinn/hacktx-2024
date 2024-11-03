@@ -4,23 +4,14 @@ export type HTTPValidationError = {
   detail?: Array<ValidationError>;
 };
 
-export type Item = {
-  name: string;
-  price: number;
-  id: number;
+export type Rom = {
+  id: string;
+  art: string;
+  title: string;
 };
 
-export type ItemCreate = {
-  name: string;
-  price: number;
-  secret_data: number;
-};
-
-export type ItemUpdate = {
-  name?: string | null;
-  price?: number | null;
-  age?: number | null;
-  secret_data?: number | null;
+export type RoomCreate = {
+  rom_id: string;
 };
 
 export type ValidationError = {
@@ -29,52 +20,18 @@ export type ValidationError = {
   type: string;
 };
 
-export type GetAllItemsGetData = {
-  query?: {
-    limit?: number;
-    offset?: number;
-  };
+export type GetRomsRomsGetResponse = Array<Rom>;
+
+export type GetRomsRomsGetError = unknown;
+
+export type GetRoomsRoomsGetResponse = Array<number>;
+
+export type GetRoomsRoomsGetError = unknown;
+
+export type CreateRoomRoomsPostData = {
+  body: RoomCreate;
 };
 
-export type GetAllItemsGetResponse = Array<Item>;
+export type CreateRoomRoomsPostResponse = number;
 
-export type GetAllItemsGetError = unknown | HTTPValidationError;
-
-export type InsertItemsPostData = {
-  body: ItemCreate;
-};
-
-export type InsertItemsPostResponse = Item;
-
-export type InsertItemsPostError = unknown | HTTPValidationError;
-
-export type GetOneItemsItemIdGetData = {
-  path: {
-    item_id: number;
-  };
-};
-
-export type GetOneItemsItemIdGetResponse = Item;
-
-export type GetOneItemsItemIdGetError = unknown | HTTPValidationError;
-
-export type UpdateItemsItemIdPutData = {
-  body: ItemUpdate;
-  path: {
-    item_id: number;
-  };
-};
-
-export type UpdateItemsItemIdPutResponse = Item;
-
-export type UpdateItemsItemIdPutError = unknown | HTTPValidationError;
-
-export type DeleteItemsItemIdDeleteData = {
-  path: {
-    item_id: number;
-  };
-};
-
-export type DeleteItemsItemIdDeleteResponse = unknown;
-
-export type DeleteItemsItemIdDeleteError = unknown | HTTPValidationError;
+export type CreateRoomRoomsPostError = HTTPValidationError;

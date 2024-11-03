@@ -6,106 +6,61 @@ import {
   type Options,
 } from "@hey-api/client-axios";
 import type {
-  GetAllItemsGetData,
-  GetAllItemsGetError,
-  GetAllItemsGetResponse,
-  InsertItemsPostData,
-  InsertItemsPostError,
-  InsertItemsPostResponse,
-  GetOneItemsItemIdGetData,
-  GetOneItemsItemIdGetError,
-  GetOneItemsItemIdGetResponse,
-  UpdateItemsItemIdPutData,
-  UpdateItemsItemIdPutError,
-  UpdateItemsItemIdPutResponse,
-  DeleteItemsItemIdDeleteData,
-  DeleteItemsItemIdDeleteError,
-  DeleteItemsItemIdDeleteResponse,
+  GetRomsRomsGetError,
+  GetRomsRomsGetResponse,
+  GetRoomsRoomsGetError,
+  GetRoomsRoomsGetResponse,
+  CreateRoomRoomsPostData,
+  CreateRoomRoomsPostError,
+  CreateRoomRoomsPostResponse,
 } from "./types.gen";
 
 export const client = createClient(createConfig());
 
 /**
- * Get All
- * Retrieve all items from the database
+ * Get Roms
  */
-export const getAllItemsGet = <ThrowOnError extends boolean = false>(
-  options?: Options<GetAllItemsGetData, ThrowOnError>,
+export const getRomsRomsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<unknown, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    GetAllItemsGetResponse,
-    GetAllItemsGetError,
+    GetRomsRomsGetResponse,
+    GetRomsRomsGetError,
     ThrowOnError
   >({
     ...options,
-    url: "/items/",
+    url: "/roms",
   });
 };
 
 /**
- * Insert
- * Insert a new item into the database
+ * Get Rooms
  */
-export const insertItemsPost = <ThrowOnError extends boolean = false>(
-  options: Options<InsertItemsPostData, ThrowOnError>,
+export const getRoomsRoomsGet = <ThrowOnError extends boolean = false>(
+  options?: Options<unknown, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    GetRoomsRoomsGetResponse,
+    GetRoomsRoomsGetError,
+    ThrowOnError
+  >({
+    ...options,
+    url: "/rooms",
+  });
+};
+
+/**
+ * Create Room
+ */
+export const createRoomRoomsPost = <ThrowOnError extends boolean = false>(
+  options: Options<CreateRoomRoomsPostData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    InsertItemsPostResponse,
-    InsertItemsPostError,
+    CreateRoomRoomsPostResponse,
+    CreateRoomRoomsPostError,
     ThrowOnError
   >({
     ...options,
-    url: "/items/",
-  });
-};
-
-/**
- * Get One
- * Retrieve an item from the database using its ID
- */
-export const getOneItemsItemIdGet = <ThrowOnError extends boolean = false>(
-  options: Options<GetOneItemsItemIdGetData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    GetOneItemsItemIdGetResponse,
-    GetOneItemsItemIdGetError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/items/{item_id}",
-  });
-};
-
-/**
- * Update
- * Update an item in the database
- */
-export const updateItemsItemIdPut = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateItemsItemIdPutData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).put<
-    UpdateItemsItemIdPutResponse,
-    UpdateItemsItemIdPutError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/items/{item_id}",
-  });
-};
-
-/**
- * Delete
- * Delete an item from the database using its ID
- */
-export const deleteItemsItemIdDelete = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteItemsItemIdDeleteData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).delete<
-    DeleteItemsItemIdDeleteResponse,
-    DeleteItemsItemIdDeleteError,
-    ThrowOnError
-  >({
-    ...options,
-    url: "/items/{item_id}",
+    url: "/rooms",
   });
 };
