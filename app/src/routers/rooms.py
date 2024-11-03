@@ -143,6 +143,7 @@ class Room:
   def player_join(self, player: Player):
     if player in self.players:
       return
+    player.nick.replace(":","")
     self.players.append(player)
     self.purgable = True
 
@@ -306,9 +307,12 @@ async def websocket(sock: WebSocket, room_id: int):
     while True:
       input: str = await sock.receive_text()
       input = input.rstrip("\n")
+      if input[0] == "C":
+        await room.broadcast(f"C:{player.nick}:{input}")
+        continue
       if input == "nothing:hold":
         await player.send(b"you are a neanderthal and should be treated as such")
-        return
+        continue
       print(input.split(":"), flush=True)
       # await room.broadcast(str.encode(f"{player.nick} said {str(input.split(":"))}"))
       if input.split(":")[0] in valid_inputs:

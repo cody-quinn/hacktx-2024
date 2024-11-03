@@ -21,7 +21,7 @@ function CreateRoomForm() {
     ...createRoomRoomsPostMutation(),
     onSuccess: async (data) => {
       await navigate({
-        to: "/rooms/$roomId",
+        to: "/$roomId",
         params: {
           roomId: `${data}`,
         },
