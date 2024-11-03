@@ -3,14 +3,13 @@ import datetime
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from numpy import empty
 from pydantic import BaseModel
 from src.emulator import Emulator
-from collections import Counter
 
 router = APIRouter()
 
 valid_inputs = [
+  "nothing"
   "left",
   "right",
   "up",
@@ -63,6 +62,14 @@ roms = {
     filename="./app/games/hungrymonster.gb",
     author="rVaquero",
     link="https://rvaquero.itch.io/hungry-monster"
+  ),
+  "doom": RomPrivate(
+    id="doom",
+    art="/assets/doom.png",
+    title="DOOM for GB",
+    filename="./app/games/doom.gb",
+    author="Villagerjj",
+    link="https://villagerjj.itch.io/doomgb"
   ),
   "sovietsnake": RomPrivate(
     id="sovietsnake",
@@ -169,7 +176,15 @@ class Room:
     lock = asyncio.Lock()
     value: str = await self.helper(lock, self.inputs)
 
-    self.emulator.send_button(value)
+    hold = False
+    splitted = value.split(":")
+    if len(splitted) > 1:
+      hold = splitted[1] == "hold"
+
+    self.emulator.send_button(
+      splitted[0],
+      hold,
+    )
     print(f"players said {value}", flush=True)
 
   async def broadcast(self, message):
@@ -280,13 +295,16 @@ async def websocket(sock: WebSocket, room_id: int):
   room.player_join(player)
 
   print(f"Player named {player.nick} joined room {room_id}.")
-  await player.send(str.encode(f"Player named {player.nick} joined room {room_id}."))
+  await room.broadcast(str.encode(f"Player named {player.nick} joined room {room_id}."))
 
   try:
     while True:
       input: str = await sock.receive_text()
       input = input.rstrip("\n")
-      if input in valid_inputs:
+      print(input.split(":"), flush=True)
+      # await room.broadcast(str.encode(f"{player.nick} said {str(input.split(":"))}"))
+      if input.split(":")[0] in valid_inputs:
+        print(input.split(":")[0], flush=True)
         room.inputs[player.id] = input
   except WebSocketDisconnect:
     room.player_leave(player)

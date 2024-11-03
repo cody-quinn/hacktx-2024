@@ -1,4 +1,5 @@
-# HackTX 2024 Hackathon
+# PartyGB: The online Gameboy emulator for parties
+**Disclaimer: This software is only intended to be used on legally obtained or public domain roms**
 
 ## Team: Tsundere Simp Association
 - [Nic Gaffney](https://github.com/nic-gaffney)
@@ -9,13 +10,12 @@
 
 Requirements: Nix
 
-If you have [direnv](https://direnv.net/) installed changing into the project directory will automatically put you into 
+If you have [direnv](https://direnv.net/) installed changing into the project directory will automatically put you into
 a development shell, otherwise run `nix develop`.
 
 Once in this shell run the following commands
 
 ```shell
-just datagen # Populates the database. Only run this once!
 just dev
 ```
 

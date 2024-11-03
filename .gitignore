@@ -19,6 +19,8 @@ __pycache__/
 
 .venv
 
+*.ram
+
 # Database
 *.sqlite
 
