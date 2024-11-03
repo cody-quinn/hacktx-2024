@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import ReactDOM from "react-dom/client";
 
 export const Route = createFileRoute("/rooms/$roomId")({
   component: RoomComponent,
@@ -19,6 +20,20 @@ function expandData(compacted: Uint8Array): Uint8Array {
   }
 
   return buffer;
+}
+
+function GameButton({
+  socket,
+  message,
+  children,
+}: {
+  socket: React.RefObject<WebSocket | null>;
+  message: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button onClick={() => socket.current?.send(message)}>{children}</button>
+  );
 }
 
 function RoomComponent() {
@@ -76,8 +91,9 @@ function RoomComponent() {
     <div
       css={{
         display: "flex",
-        flexWrap: "wrap",
-        fontSize: 5,
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: 32,
       }}
     >
       <canvas
@@ -89,6 +105,30 @@ function RoomComponent() {
           imageRendering: "pixelated",
         }}
       />
+
+      <div css={{
+        display: "flex",
+        "& button": {
+          width: 80,
+          height: 80,
+        }
+      }}>
+        {[
+          "nothing",
+          "left",
+          "right",
+          "up",
+          "down",
+          "a",
+          "b",
+          "start",
+          "select",
+        ].map((action) => (
+          <GameButton socket={wsConnectionRef} message={action}>
+            {action}
+          </GameButton>
+        ))}
+      </div>
     </div>
   );
 }
