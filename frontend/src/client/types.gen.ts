@@ -19,6 +19,7 @@ export type Rom = {
 
 export type RoomCreate = {
   rom_id: string;
+  game_speed: number;
 };
 
 export type RoomPublic = {

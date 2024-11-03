@@ -28,7 +28,7 @@ class Emulator:
 
   def start(self):
     self.game.game_wrapper.start_game(timer_div=0x00)
-    # self.game.set_emulation_speed(0)
+    self.game.set_emulation_speed(0)
 
   def stop(self):
     self.game.stop()

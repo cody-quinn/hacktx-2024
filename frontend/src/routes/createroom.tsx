@@ -32,12 +32,14 @@ function CreateRoomForm() {
   const roms = query.data;
 
   const [selectedRom, setSelectedRom] = useState<string>("");
+  const [gameSpeed, setGameSpeed] = useState(1.0);
 
   function createRoom() {
     if (selectedRom !== "") {
       mutation.mutate({
         body: {
           rom_id: selectedRom!,
+          game_speed: gameSpeed,
         },
       });
     }
@@ -45,7 +47,16 @@ function CreateRoomForm() {
 
   return (
     <>
-      <span>{selectedRom}</span>
+      <p>Gamespeed: {gameSpeed}</p>
+      <input
+        type="range"
+        value={gameSpeed}
+        min={0}
+        max={2.0}
+        step={0.1}
+        onChange={(e) => setGameSpeed(e.target.valueAsNumber)}
+      />
+      <br />
       <select
         onChange={(e) => setSelectedRom(e.target.value)}
         value={selectedRom}

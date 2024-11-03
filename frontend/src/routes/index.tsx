@@ -1,4 +1,3 @@
-import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -8,7 +7,7 @@ export const Route = createFileRoute("/")({
 function HomeComponent() {
   return (
     <div>
-      <h1>Homepage</h1>
+      <h1>PartyGB Homepage</h1>
       <h3>
         <Link to={"/createroom"}>Create room</Link>
       </h3>

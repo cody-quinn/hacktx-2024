@@ -119,17 +119,19 @@ class Room:
   task: asyncio.Task | None
   emulator: Emulator
   purgable: bool
+  game_speed: float
   id: int
   players: list[Player]
   rom: RomPrivate
   inputs: dict[int,str]
   started_at: datetime.datetime
 
-  def __init__(self, rom: RomPrivate):
+  def __init__(self, rom: RomPrivate, game_speed: float):
     self.rom = rom
     self.purgable = False
     self.task = None
     self.task2 = None
+    self.game_speed = game_speed
     self.emulator = Emulator(rom.filename)
 
     self.id = next(room_id)
@@ -180,6 +182,9 @@ class Room:
     if len(splitted) > 1:
       hold = splitted[1] == "hold"
 
+    if ("nothing" in value):
+      print(f"players said {value}", flush=True)
+      return
     self.emulator.send_button(
       splitted[0],
       hold,
@@ -223,7 +228,7 @@ class Room:
             player.fresh = False
             await player.send(b'F' + self.emulator.framebuffer)
 
-        await asyncio.sleep(1/60)
+        await asyncio.sleep(1/(60 * self.game_speed))
     finally:
       pass
 
@@ -267,6 +272,7 @@ class RoomPublic(BaseModel):
 
 class RoomCreate(BaseModel):
   rom_id: str
+  game_speed: float
 
 @router.get("/rooms", response_model=list[RoomPublic])
 async def get_rooms() -> list[RoomPublic]:
@@ -274,7 +280,7 @@ async def get_rooms() -> list[RoomPublic]:
 
 @router.post("/rooms")
 async def create_room(body: RoomCreate) -> int:
-  room = Room(roms[body.rom_id])
+  room = Room(roms[body.rom_id], body.game_speed)
   rooms[room.id] = room
   room.start()
   return room.id
@@ -293,7 +299,7 @@ async def websocket(sock: WebSocket, room_id: int):
 
   room.player_join(player)
 
-  print(f"Player named {player.nick} joined room {room_id}.")
+  print(f"Player named {player.nick} joined room {room_id}.", flush=True)
   await room.broadcast(str.encode(f"Player named {player.nick} joined room {room_id}."))
 
   try:

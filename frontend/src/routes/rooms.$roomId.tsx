@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
 export const Route = createFileRoute("/rooms/$roomId")({
-  component: RoomComponent,
+  component: RoomWrapperComponent,
 });
 
 const palette = [0xffffff, 0xaaaaaa, 0x666666, 0x000000];
@@ -36,7 +36,31 @@ function GameButton({
   );
 }
 
-function RoomComponent() {
+function RoomWrapperComponent() {
+  const [nick, setNick] = React.useState<string | null>(null);
+  const nickInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  function submitNickname() {
+    const nick = nickInputRef.current?.value ?? null;
+    if (nick !== "") {
+      setNick(nick);
+    }
+  }
+
+  if (nick === null) {
+    return (
+      <>
+        <p>Please enter a nickname:</p>
+        <input type="text" defaultValue={"Player"} ref={nickInputRef} />
+        <button onClick={submitNickname}>Join Room</button>
+      </>
+    );
+  }
+
+  return <RoomComponent nickname={nick} />;
+}
+
+function RoomComponent({ nickname }: { nickname: string }) {
   let { roomId } = Route.useParams();
 
   const wsConnectionRef = React.useRef<WebSocket | null>(null);
@@ -49,7 +73,7 @@ function RoomComponent() {
 
     // Connection opened
     socket.addEventListener("open", (event) => {
-      socket.send("Hi");
+      socket.send(nickname);
     });
 
     // Listen for messages
